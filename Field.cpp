@@ -19,12 +19,16 @@ void Field::setPosition(int y, int x){
 }
 
 void Field::drawColored(){ 
-	init_color(COLOR_GREEN, 0 , 1000 * _grassLevel / maxGrass, 0);
-	init_pair(1, COLOR_GREEN, COLOR_BLACK);
-	attron(COLOR_PAIR(1));
-	mvprintw(_positionY, _positionX * 2, _sign.c_str());
-	attroff(COLOR_PAIR(1));
-    refresh();
+	
+    if(_unit == nullptr){
+        init_color(COLOR_GREEN, 0 , 1000 * _grassLevel / maxGrass, 0);
+	    init_pair(1, COLOR_GREEN, COLOR_GREEN);
+	    attron(COLOR_PAIR(1));
+        _sign[0]=_sign[1]++;
+        mvprintw(_positionY, _positionX*2 , _sign.c_str());
+	    attroff(COLOR_PAIR(1));
+        refresh();
+    }
 }
 
 void Field::setSign(std::string sign){
@@ -34,8 +38,9 @@ void Field::setSign(std::string sign){
 void Field::run(){
     while(true){
         std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-        if(_grassLevel < maxGrass)
-            _grassLevel++;
+        if(_grassLevel >= maxGrass)
+            continue;
+        _grassLevel++;
         grassMutex.lock();
         drawColored();
         grassMutex.unlock();

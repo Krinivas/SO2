@@ -1,13 +1,18 @@
 #pragma once
 #include <vector>
 #include <ncurses.h>
+#include <random>
 #include "Field.h"
 class Map
 {
-	int _rozmiar;
+    const static int startSheepCount = 5;
+	static std::mutex unitMutex;
+    int _size;
 	std::vector<std::vector<Field>> tableField;
+    void spawnSheep();
 public:
-	Map(int rozmiar);
+	int randomInt(int from, int to);
+    Map(int rozmiar);
 	~Map();
 	void Init();
 };

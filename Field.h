@@ -5,9 +5,11 @@
 #include <string>
 #include <chrono>
 #include <mutex>
+class Map;
 
 class Field
 {
+    friend class Map;
 	int _positionX;
 	int _positionY;
 	int _grassLevel;
