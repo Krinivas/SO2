@@ -1,6 +1,6 @@
 #pragma once
 #include <vector>
-#include <ncurses.h>
+#include "curses.h"
 #include <random>
 #include "Field.h"
 class Map
@@ -9,9 +9,9 @@ class Map
 	static std::mutex unitMutex;
     int _size;
 	std::vector<std::vector<Field>> tableField;
-    void spawnSheep();
+    void spawnSheep(int number);
 public:
-	int randomInt(int from, int to);
+	static int randomInt(int from, int to);
     Map(int rozmiar);
 	~Map();
 	void Init();

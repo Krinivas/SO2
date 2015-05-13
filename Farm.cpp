@@ -4,7 +4,7 @@
 
 #include "Map.h"
 #include <iostream>
-#include <ncurses.h>
+#include "curses.h"
 
 
 int main(int argc, char* argv[])
@@ -18,8 +18,8 @@ int main(int argc, char* argv[])
     //    exit(1);
     //}
     Map mapa(10);
-//    mapa.Init();
-	getch();
+    mapa.Init();
+	while(getch()!='q');
 	return 0;
 
 }
