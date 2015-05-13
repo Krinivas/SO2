@@ -24,7 +24,8 @@ Map::~Map(){
 void Map::Init(){
 	for (int i = 0; i < startSheepCount ; i++)
         spawnSheep(i);
-
+	for (int i = 0; i < startWolfCount; i++)
+		spawnWolf(i);
 	refresh();
 }
 
@@ -38,6 +39,18 @@ void Map::spawnSheep(int number){
     tableField[positionY][positionX]._unit =
             new Sheep(&tableField, positionY, positionX, number);
     unitMutex.unlock();
+}
+
+void Map::spawnWolf(int number){
+	unitMutex.lock();
+	int positionY, positionX;
+	do{
+		positionX = randomInt(0, _size - 1);
+		positionY = randomInt(0, _size - 1);
+	} while (tableField[positionY][positionX]._unit != nullptr);
+	tableField[positionY][positionX]._unit =
+		new Wolf(&tableField, positionY, positionX, number);
+	unitMutex.unlock();
 }
 
 int Map::randomInt(int from, int to){

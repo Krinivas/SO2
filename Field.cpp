@@ -6,6 +6,7 @@ std::mutex Field::grassMutex;
 
 Field::Field() : _grassLevel(startGrass), _unit(nullptr)
 {
+	_sign = "aa";
    _runThread = std::thread(&Field::run, this);
 }
 
@@ -59,6 +60,8 @@ void Field::run(){
             _grassLevel++;
             drawColored();
         }
+		if (_sign == "zz")
+			_sign == "aa";
     }
 }
 

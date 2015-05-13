@@ -1,5 +1,7 @@
 #pragma once
 #include "Sheep.h"
+#include "Wolf.h"
+//#include "Unit.h"
 #include "curses.h"
 #include <thread>
 #include <string>
@@ -12,15 +14,17 @@ class Field
 {
     friend class Map;
     friend class Sheep;
+	friend class Unit;
+	friend class Wolf;
 	int _positionX;
 	int _positionY;
 	int _grassLevel;
 	std::string _sign;
-	Sheep* _unit;
+	Unit* _unit;
     std::thread _runThread;
     static std::mutex grassMutex;
 public:
-	const static int maxGrass = 10;
+	const static int maxGrass = 1;
 	const static int startGrass = 5;
     Field();
 	~Field();

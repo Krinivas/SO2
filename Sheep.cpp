@@ -1,16 +1,12 @@
 #include "Sheep.h"
+#include "Field.h"
 
-std::mutex Sheep::moveMutex;
-std::mutex Sheep::drawStateMutex;
-Sheep::Sheep(	std::vector<std::vector<Field>>* tableField,
+Sheep::Sheep(std::vector<std::vector<Field>>* tableField,
                 int positionY,
                 int positionX,
-                int number) :_tableField(tableField),
-                                _positionY(positionY),
-                                _positionX(positionX),
-								_number(number),
-                                _foodActual(foodDefault),
-                                _died(false){
+                int number) : Unit(tableField,positionY,positionX, number) {
+
+	_foodActual = foodDefault;
     _name = "S" + std::to_string(number);
     _runThread = std::thread(&Sheep::run, this);
 }
@@ -23,13 +19,12 @@ Sheep::~Sheep()
 void Sheep::run(){
     while(!_died){
 		_foodActual--;
-    if(_foodActual < foodMax)
-        eat();
-    if((*_tableField)[_positionY][_positionX]._grassLevel == 0)
-        move();
+		if(_foodActual < foodMax)
+			eat();
+		if((*_tableField)[_positionY][_positionX]._grassLevel == 0)
+			move();
 		drawState();
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
-                             
+		std::this_thread::sleep_for(std::chrono::milliseconds(500));
     }
 }
 
@@ -58,17 +53,8 @@ void Sheep::eat(){
 }
 
 
-void Sheep::die(){
-    _died = true;
-}
 
-std::string Sheep::getName(){
-    return _name;
-}
 
-bool Sheep::isDied(){
-    return _died;
-}
 
 int Sheep::getGrassUp(){
     if( _positionY - 1 < 0)
@@ -128,66 +114,25 @@ bool Sheep::isMoveLeftBest(){
             getGrassLeft() >= getGrassRight()&&
             getGrassLeft() > 0);
 }
-void Sheep::moveUp(){
-    if( _positionY - 1 >= 0) 
-        if((*_tableField)[_positionY-1][_positionX]._unit==nullptr){
-            (*_tableField)[_positionY-1][_positionX]._unit=this;
-            (*_tableField)[_positionY][_positionX]._unit=nullptr;
-            (*_tableField)[_positionY][_positionX].drawColored();
-            (*_tableField)[_positionY-1][_positionX].drawColored();
-            _positionY--;
-        }
-}
-
-
-void Sheep::moveDown(){
-    if( _positionY + 1 < (*_tableField).size()) 
-        if((*_tableField)[_positionY+1][_positionX]._unit==nullptr){
-            (*_tableField)[_positionY+1][_positionX]._unit=this;
-            (*_tableField)[_positionY][_positionX]._unit=nullptr;
-            (*_tableField)[_positionY][_positionX].drawColored();
-            (*_tableField)[_positionY+1][_positionX].drawColored();
-            _positionY++;
-        }
-}
-void Sheep::moveRight(){
-    if( _positionX + 1 < (*_tableField).size()) 
-        if((*_tableField)[_positionY][_positionX+1]._unit==nullptr){
-            (*_tableField)[_positionY][_positionX+1]._unit=this;
-            (*_tableField)[_positionY][_positionX]._unit=nullptr;
-            (*_tableField)[_positionY][_positionX].drawColored();
-            (*_tableField)[_positionY][_positionX+1].drawColored();
-            _positionX++;
-        }
-}
-void Sheep::moveLeft(){
-    if( _positionX - 1 >= 0) 
-        if((*_tableField)[_positionY][_positionX-1]._unit==nullptr){
-            (*_tableField)[_positionY][_positionX-1]._unit=this;
-            (*_tableField)[_positionY][_positionX]._unit=nullptr;
-            (*_tableField)[_positionY][_positionX].drawColored();
-            (*_tableField)[_positionY][_positionX-1].drawColored();
-            _positionX--;
-        }
-}
 
 std::string Sheep::getState(){
-	if (_foodActual >= 0&& _foodActual <= 9)
-		return "Sheep number: " + getName() + " Food:  " + std::to_string(_foodActual);
+	if (_foodActual >= 0 && _foodActual <= 9)
+		return "Sheep number: " + Unit::getName() + " Food:  " + std::to_string(_foodActual);
 	else
-		return "Sheep number: " + getName() + " Food: " + std::to_string(_foodActual);
+		return "Sheep number: " + Unit::getName() + " Food: " + std::to_string(_foodActual);
 
 }
 
-int Sheep::getActualFood(){
-	return _foodActual;
-}
 
 void Sheep::drawState(){
 	drawStateMutex.lock();
 	init_pair(3, COLOR_WHITE, COLOR_BLACK);
 	attron(COLOR_PAIR(3));
-	mvprintw(_number, (*_tableField).size()*2 + 5, getState().c_str());
+	mvprintw(_number, (*_tableField).size() * 2 + 5, getState().c_str());
 	attroff(COLOR_PAIR(3));
 	drawStateMutex.unlock();
+}
+
+std::string Sheep::getType(){
+	return "sheep";
 }
