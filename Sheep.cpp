@@ -1,6 +1,8 @@
 #include "Sheep.h"
 #include "Field.h"
 
+
+
 Sheep::Sheep(std::vector<std::vector<Field>>* tableField,
                 int positionY,
                 int positionX,
@@ -21,15 +23,16 @@ void Sheep::run(){
 		_foodActual--;
 		if(_foodActual < foodMax)
 			eat();
-		if((*_tableField)[_positionY][_positionX]._grassLevel == 0)
+		if((*_tableField)[_positionY][_positionX]._grassLevel < 3)
 			move();
 		drawState();
 		std::this_thread::sleep_for(std::chrono::milliseconds(500));
     }
+	drawState();
 }
 
 void Sheep::move(){
-    moveMutex.lock();
+	unitMutex.lock();
     _foodActual--;
     if( isMoveUpBest() )
         moveUp();
@@ -40,7 +43,7 @@ void Sheep::move(){
     else if (isMoveRightBest())
         moveRight();
 	refresh();
-    moveMutex.unlock();
+	unitMutex.unlock();
 }
 void Sheep::eat(){
     if((*_tableField)[_positionY][_positionX]._grassLevel > 1){
@@ -116,10 +119,17 @@ bool Sheep::isMoveLeftBest(){
 }
 
 std::string Sheep::getState(){
+	std::string out;
 	if (_foodActual >= 0 && _foodActual <= 9)
-		return "Sheep number: " + Unit::getName() + " Food:  " + std::to_string(_foodActual);
+		out = "Sheep: " + Unit::getName() + " Food:  " + std::to_string(_foodActual);
 	else
-		return "Sheep number: " + Unit::getName() + " Food: " + std::to_string(_foodActual);
+		out = "Sheep: " + Unit::getName() + " Food: " + std::to_string(_foodActual);
+
+	if (_died)
+		out += " IS DEAD";
+	else
+		out += "        ";
+	return out;
 
 }
 

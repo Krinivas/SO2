@@ -11,7 +11,8 @@ class Field;
 class Unit
 {
 protected:
-	static std::mutex moveMutex;
+	friend class Map;
+	static std::mutex unitMutex;
 	static std::mutex drawStateMutex;
 	std::vector<std::vector<Field>>* _tableField;
 	int _number;
@@ -38,7 +39,7 @@ public:
 		int number);
 	virtual ~Unit();
 
-	bool isDied();
+	bool isDead();
 	std::string getName();
 	virtual std::string getState() = 0;
 	int getActualFood();

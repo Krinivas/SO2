@@ -1,6 +1,8 @@
 #include "Wolf.h"
 #include "Field.h"
 
+
+
 Wolf::Wolf(std::vector<std::vector<Field>>* tableField,
 	int positionY,
 	int positionX,
@@ -14,39 +16,51 @@ Wolf::Wolf(std::vector<std::vector<Field>>* tableField,
 
 Wolf::~Wolf()
 {
+	_died = true;
 }
 
 void Wolf::run(){
 	while (!_died){
 		_foodActual--;
 		if (_foodActual < foodMax)
-			eat();
-		move();
+			hunt();
+		if (_foodActual < 0)
+			_died = true;
 		drawState();
 		std::this_thread::sleep_for(std::chrono::milliseconds(500));
 	}
+	drawState();
 }
 
-void Wolf::eat(){
 
-}
-void Wolf::move(){
+void Wolf::hunt(){
+	unitMutex.lock();
 	Sheep* closestSheep = findClosestSheep();
-	moveToClosestSheep(closestSheep);
+	if (closestSheep != nullptr){
+		moveToClosestSheep(closestSheep);
+		tryToKillDatSheep(closestSheep);
+	}
+	unitMutex.unlock();
 }
 
 std::string Wolf::getState(){
+	std::string out;
 	if (_foodActual >= 0 && _foodActual <= 9)
-		return "Wolf number: " + Unit::getName() + " Food:  " + std::to_string(_foodActual);
+		out = "Wolf: " + Unit::getName() + " Food:  " + std::to_string(_foodActual);
 	else
-		return "Wolf number: " + Unit::getName() + " Food: " + std::to_string(_foodActual);
+		out = "Wolf: " + Unit::getName() + " Food: " + std::to_string(_foodActual);
+	if (_died)
+		out += " IS DEAD";
+	else
+		out += "        ";
+	return out;
 }
 
 void Wolf::drawState(){
 	drawStateMutex.lock();
 	init_pair(3, COLOR_WHITE, COLOR_BLACK);
 	attron(COLOR_PAIR(3));
-	mvprintw(_number+10, (*_tableField).size() * 2 + 5, getState().c_str());
+	mvprintw(_number + (*_tableField).size()+ 2, 0, getState().c_str());
 	attroff(COLOR_PAIR(3));
 	drawStateMutex.unlock();
 }
@@ -62,7 +76,8 @@ Sheep* Wolf::findClosestSheep(){
 		for (int x = 0; x < _tableField->size(); x++)
 			if ((*_tableField)[y][x]._unit != nullptr)
 				if ((*_tableField)[y][x]._unit->getType() == "sheep")
-					if ((abs(this->_positionY - y) + abs(this->_positionX - x)) < distance){
+					if ((abs(this->_positionY - y) + abs(this->_positionX - x)) < distance)
+						if (!(*_tableField)[y][x]._unit->isDead()){
 						closestSheep = dynamic_cast<Sheep*>((*_tableField)[y][x]._unit);
 						distance = (abs(this->_positionY - y) + abs(this->_positionX - x));
 					}
@@ -72,8 +87,6 @@ Sheep* Wolf::findClosestSheep(){
 void Wolf::moveToClosestSheep(Sheep* closestSheep) {
 	if (closestSheep == nullptr)
 		return;
-	
-
 	if (closestSheep->_positionY < this->_positionY){
 		if (!moveUp())
 			if (closestSheep->_positionX < this->_positionX){
@@ -119,4 +132,34 @@ void Wolf::moveToClosestSheep(Sheep* closestSheep) {
 							return;
 			}
 	}
+}
+
+void Wolf::tryToKillDatSheep(Sheep* closestSheep){
+	if (_positionY - 1 >= 0)
+		if ((*_tableField)[_positionY - 1][_positionX]._unit == closestSheep){
+			killDatSheep(closestSheep);
+			return;
+		}
+	if (_positionY + 1 < (*_tableField).size())
+		if ((*_tableField)[_positionY + 1][_positionX]._unit == closestSheep){
+			killDatSheep(closestSheep);
+			return;
+		}
+	if (_positionX - 1 >= 0)
+		if ((*_tableField)[_positionY][_positionX - 1]._unit == closestSheep){
+			killDatSheep(closestSheep);
+			return;
+		}
+	if (_positionX + 1 < (*_tableField).size())
+		if ((*_tableField)[_positionY][_positionX + 1]._unit == closestSheep){
+			killDatSheep(closestSheep);
+			return;
+		}
+	
+}
+
+void Wolf::killDatSheep(Sheep* closestSheep){
+	_foodActual += 20 + closestSheep->_foodActual;
+	closestSheep->die();
+	
 }

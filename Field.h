@@ -16,6 +16,7 @@ class Field
     friend class Sheep;
 	friend class Unit;
 	friend class Wolf;
+	static bool isEndOfTheWorld;
 	int _positionX;
 	int _positionY;
 	int _grassLevel;
@@ -33,6 +34,7 @@ public:
 	void setSign(std::string sign);
     void run();
     int getGrassLevel();
+	bool isSomethingDead();
 	
 };
 

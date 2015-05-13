@@ -17,8 +17,8 @@ int main(int argc, char* argv[])
     //    printf("Your terminal does not support color\n");
     //    exit(1);
     //}
-    Map mapa(10);
-    mapa.Init();
+    Map mapa(20);
+	mapa.Spawn();
 	while(getch()!='q');
 	return 0;
 

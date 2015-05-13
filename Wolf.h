@@ -7,15 +7,17 @@ class Wolf :
 {
 	void run();
 	void eat();
-	void move();
+	void hunt();
 
 
-	const static int foodMax = 99;
-	const static int foodDefault = 50;
+	const static int foodMax = 50;
+	const static int foodDefault = 25;
 	void drawState();
 	
 	Sheep* findClosestSheep();
 	void moveToClosestSheep(Sheep* closestSheel);
+	void tryToKillDatSheep(Sheep* closestSheep);
+	void killDatSheep(Sheep* closestSheep);
 public:
 	std::string getType() override;
 	std::string getState() override;

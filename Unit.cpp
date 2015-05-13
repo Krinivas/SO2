@@ -1,6 +1,6 @@
 #include "Unit.h"
 #include "Field.h"
-std::mutex Unit::moveMutex;
+std::mutex Unit::unitMutex;
 std::mutex Unit::drawStateMutex;
 
 Unit::Unit(std::vector<std::vector<Field>>* tableField,
@@ -16,9 +16,10 @@ Unit::Unit(std::vector<std::vector<Field>>* tableField,
 
 Unit::~Unit()
 {
+	_runThread.detach();
 }
 
-bool Unit::isDied(){
+bool Unit::isDead(){
 	return _died;
 }
 
