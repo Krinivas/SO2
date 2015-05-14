@@ -89,11 +89,6 @@ void Map::underTaker(Unit* unit){
 			int num = unit->_number;
 			tableField[unit->_positionY][unit->_positionX]._unit = nullptr;
 			Unit::unitMutex.unlock();
-		/*	std::this_thread::sleep_for(std::chrono::milliseconds(3000));
-			if (unit->getType()=="sheep")
-				spawnSheep(num);
-			if (unit->getType() == "wolf")
-				spawnWolf(num);*/
 		}
 	}
 }

@@ -25,8 +25,8 @@ class Field
     std::thread _runThread;
     static std::mutex grassMutex;
 public:
-	const static int maxGrass = 1;
-	const static int startGrass = 5;
+	const static int maxGrass = 10;
+	const static int startGrass = 2;
     Field();
 	~Field();
 	void setPosition(int x, int y);
